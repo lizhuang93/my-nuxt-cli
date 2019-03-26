@@ -1,5 +1,6 @@
 const pkg = require('./package')
-
+const env = process.env.NODE_ENV || 'production'
+let config = require(`./config/${env}.env`)
 
 module.exports = {
   mode: 'universal',
@@ -35,14 +36,30 @@ module.exports = {
   ** Plugins to load before mounting the App
   */
   plugins: [
+    '~/plugins/axios', // 扩展axios请求方法
   ],
 
   /*
   ** Nuxt.js modules
   */
   modules: [
+    '@nuxtjs/axios',
   ],
-
+  /*
+  ** Axios module configuration
+  */
+  axios: {
+    proxy: true,
+    // See https://github.com/nuxt-community/axios-module#options
+    baseURL: config.baseURL,
+    browserBaseURL: '/' //config.feServerBaseUrl
+  },
+  proxy: {
+    // 替换/api
+    // '/api/': { target: 'https://www.bitdeer.com', pathRewrite: { '^/api/': '' } },
+    // 拼接/api
+    '/api': config.baseURL
+  },
   /*
   ** Build configuration
   */
@@ -50,11 +67,14 @@ module.exports = {
     /*
     ** You can extend webpack config here
     */
+    publicPath: env === 'production' ? 'http://lizhuang.static.com/static' : '/_nuxt/',
+    filenames: {
+      app: ({ isDev }) => isDev ? '[name].js' : '[name].[contenthash:8].js',
+      chunk: ({ isDev }) => isDev ? '[name].js' : '[name].[contenthash:8].js',
+      css: ({ isDev }) => isDev ? '[name].css' : '[name].[contenthash:8].css',
+    },
     extend(config, ctx) {
-      config.output.filename = '[name].[contenthash:8].js'
-      config.output.chunkFilename = '[name].[contenthash:8].js'
-      config.output.publicPath = 'http://other.domain.com/static'
-      console.log(config, '!!!!!!!!!!!!!!!!!!!', ctx)
+      // console.log(config, '!!!!!!!!!!!!!!!!!!!', ctx)
     }
   }
 }

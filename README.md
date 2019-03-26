@@ -85,15 +85,55 @@ test1:
     /*
     ** You can extend webpack config here
     */
+    publicPath: env === 'production' ? 'http://lizhuang.static.com/static' : '/_nuxt/',
+    filenames: {
+      app: ({ isDev }) => isDev ? '[name].js' : '[name].[contenthash:8].js',
+      chunk: ({ isDev }) => isDev ? '[name].js' : '[name].[contenthash:8].js',
+      css: ({ isDev }) => isDev ? '[name].css' : '[name].[contenthash:8].css',
+    },
     extend(config, ctx) {
-      config.output.filename = '[name].[contenthash:8].js'
-      config.output.chunkFilename = '[name].[contenthash:8].js'
-      config.output.publicPath = 'http://other.domain.com/static'
       console.log(config, '!!!!!!!!!!!!!!!!!!!', ctx)
     }
   }
 ```
 
-## 6. 添加axios
+## 6. 添加axios Module, 集成代理
+> 以modules的形式引入，服务端和客户端都可以使用，客户端挂在到vue原型上，服务端context上。
+[https://axios.nuxtjs.org/extend](https://axios.nuxtjs.org/extend)
+1. 集成module
+```
+$ yarn add @nuxtjs/axios
 
-## 7. 代理配置
+module.exports = {
+  modules: [
+    '@nuxtjs/axios',
+  ],
+
+  axios: {
+    // proxyHeaders: false
+  }
+}
+```
+2. 添加请求响应拦截、baseURL(server side)、browserBaseURL(client side)，代理（axios自带）
+```
+{
+  modules: [
+    '@nuxtjs/axios',
+  ],
+
+  plugins: [
+    '~/plugins/axios'
+  ],
+  axios: {
+    proxy: true,
+    // See https://github.com/nuxt-community/axios-module#options
+    baseURL: config.baseURL,
+    browserBaseURL: '/' //config.feServerBaseUrl
+  },
+  // 自动携带客户端cookie
+  proxy: {
+    '/api/': 'http://api.example.com',
+    '/api2/': 'http://api.another-website.com'
+  }
+}
+```

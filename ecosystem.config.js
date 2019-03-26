@@ -14,7 +14,7 @@ module.exports = {
     },
 
     env_test1: {
-      NODE_ENV: 'production',
+      NODE_ENV: 'test',
       HOST: '0.0.0.0',
       PORT: '8080',
       ENABLE_NODE_LOG: 'YES',

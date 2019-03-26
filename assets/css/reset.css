@@ -58,7 +58,6 @@ a {
 }
 html,body {
   height: 100%;
-  background: red;
 }
 /*消除window、mac系统差异，windows border-width:2px mac: border-width:1px*/
 button {
