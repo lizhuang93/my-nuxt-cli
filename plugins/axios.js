@@ -1,16 +1,16 @@
-export default function ({ $axios, redirect }) {
+export default function({ $axios, redirect }) {
   $axios.onRequest(config => {
-    console.log('Making request to ', config)
-  })
+    console.log('Making request to ', config);
+  });
 
   $axios.onResponse(res => {
-    console.log('res', res)
-  })
+    console.log('res', res);
+  });
 
   $axios.onError(error => {
-    const code = parseInt(error.response && error.response.status)
+    const code = parseInt(error.response && error.response.status);
     if (code === 400) {
-      redirect('/400')
+      redirect('/400');
     }
-  })
+  });
 }

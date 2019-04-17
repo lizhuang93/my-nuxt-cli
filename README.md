@@ -158,3 +158,101 @@ nuxt.config.js中添加modules
   props: ['item'],
   serverCacheKey: props => props.item.id,
 ```
+## 8. 集成scss/less
+```
+yarn add node-sass sass-loader -D
+yarn add less less-loader -D
+```
+得益于 vue-loader, 直接使用scss/less：
+```
+<style scoped lang="scss">
+.red {
+  color: red
+}
+</style>
+
+<style scoped lang="less">
+.red {
+  color: red
+}
+</style>
+```
+## 9. 集成eslint、prettier and Pre-commit Hook 约束代码提交
+```
+yarn add babel-eslint eslint eslint-config-standard eslint-plugin-html eslint-plugin-promise eslint-plugin-standard eslint-plugin-import eslint-plugin-node -D
+yarn add prettier -D --exact
+yarn add eslint-plugin-prettier eslint-config-prettier eslint-plugin-vue -D
+```
+添加.eslintrc.js文件
+```
+module.exports = {
+  parser: 'vue-eslint-parser',
+  parserOptions: {
+    parser: 'babel-eslint',
+    ecmaVersion: 2017,
+    sourceType: 'module',
+  },
+  extends: ['prettier', 'plugin:vue/essential'], // prettier 和 eslint-plugin-vue
+  plugins: ['prettier'],
+  rules: {
+    'prettier/prettier': ['error'],
+    'no-param-reassign': ['off'], // 禁止对 function 的参数进行重新赋值
+    "no-unused-vars": "warn", // 禁止未使用变量
+  },
+};
+```
+添加.prettierrc文件
+```
+{
+ "tabWidth": 2,
+ "printWidth": 120,
+ "trailingComma": "es5",
+ "semi": true,
+ "singleQuote": true
+}
+```
+pageage.json中添加
+```
+// script
+scprit: {
+  "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
+  "format": "prettier --write '{components,config,layouts,pages,plugins,store,utils}/**/*.{js,json,vue,less}'"
+}
+
+// commit 约束代码提交
+"husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+"lint-staged": {
+    "*.{js,json,css,md}": ["prettier --write", "git add"]
+  }
+```
+vscode 保存自动修复
+```
+{
+    "editor.snippetSuggestions": "top",
+    // Controls whether format on paste is on or off
+    "editor.formatOnPaste": true,
+    "editor.tabSize": 2,
+    "eslint.autoFixOnSave": true, //  启用保存时自动修复,默认只支持.js文件
+    "eslint.validate": [
+        "javascript", //  用eslint的规则检测js文件
+        {
+            "language": "vue", // 检测vue文件
+            "autoFix": true //  为vue文件开启保存自动修复的功能
+        },
+        {
+            "language": "html",
+            "autoFix": true
+        },
+    ],
+    "javascript.updateImportsOnFileMove.enabled": "always",
+    "sync.gist": "b2bb58bfee03a56d46e0de798ca8ec9f",
+    "editor.fontSize": 16,
+    "window.zoomLevel": 0,
+    "commentTranslate.targetLanguage": "zh-CN"
+}
+```
+

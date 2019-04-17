@@ -1,5 +1,5 @@
 const config = {
-  baseURL: 'https://www.bitdeer.com'
-}
+  baseURL: 'https://www.bitdeer.com',
+};
 
-module.exports = config
+module.exports = config;
