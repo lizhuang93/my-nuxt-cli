@@ -1,5 +1,5 @@
 ## 前提
-node环境
+安装node环境
 
 ## 1. 安装create-nuxt-app
 [nuxt中文官网](https://zh.nuxtjs.org/guide/installation)，跟着官网一步一步来。
@@ -17,12 +17,14 @@ $ yarn start
 ```
 ## 3. 使用pm2进程管理部署
 [pm2中文官网](https://pm2.io/doc/zh/runtime/quick-start/)
+
 ```
 // 安装pm2
 $ yarn global add pm2
 // 初始化生态系统文件
 $ pm2 init
 ```
+
 然后会生成ecosystem.config.js文件，[ecosystem文件](https://pm2.io/doc/zh/runtime/reference/ecosystem-file/)参考。
 ```
 module.exports = {
@@ -98,7 +100,7 @@ test1:
 ```
 
 ## 6. 添加axios Module, 集成代理
-> 以modules的形式引入，服务端和客户端都可以使用，客户端挂在到vue原型上，服务端context上。
+> 以modules的形式引入，服务端和客户端都可以使用，自动挂在到客户端vue原型上，服务端context上。
 [https://axios.nuxtjs.org/extend](https://axios.nuxtjs.org/extend)
 1. 集成module
 ```
@@ -122,13 +124,14 @@ module.exports = {
   ],
 
   plugins: [
+    // axios请求响应拦截
     '~/plugins/axios'
   ],
   axios: {
     proxy: true,
     // See https://github.com/nuxt-community/axios-module#options
     baseURL: config.baseURL,
-    browserBaseURL: '/' //config.feServerBaseUrl
+    browserBaseURL: '/'
   },
   // 自动携带客户端cookie
   proxy: {
@@ -136,4 +139,22 @@ module.exports = {
     '/api2/': 'http://api.another-website.com'
   }
 }
+```
+
+## 7. 添加组件缓存
+nuxt.config.js中添加modules
+```
+  modules: [
+    // 配置选项
+    ['@nuxtjs/component-cache', {
+      max: 10000,
+      maxAge: 1000 * 60 * 0.1 // 0.1分钟 (这里方便测试)
+    }],
+  ],
+```
+组件中使用：[https://ssr.vuejs.org/zh/guide/caching.html#%E7%BB%84%E4%BB%B6%E7%BA%A7%E5%88%AB%E7%BC%93%E5%AD%98-component-level-caching](https://ssr.vuejs.org/zh/guide/caching.html#%E7%BB%84%E4%BB%B6%E7%BA%A7%E5%88%AB%E7%BC%93%E5%AD%98-component-level-caching)
+```
+  name: 'item', // 必填选项
+  props: ['item'],
+  serverCacheKey: props => props.item.id,
 ```

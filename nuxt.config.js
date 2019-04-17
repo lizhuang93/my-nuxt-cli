@@ -44,6 +44,11 @@ module.exports = {
   */
   modules: [
     '@nuxtjs/axios',
+    // 配置选项
+    ['@nuxtjs/component-cache', {
+      max: 10000,
+      maxAge: 1000 * 60 * 0.1 // 0.1分钟 
+    }],
   ],
   /*
   ** Axios module configuration
