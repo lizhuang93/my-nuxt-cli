@@ -1,22 +1,30 @@
 ## 前提
-安装node环境
 
-## 1. 安装create-nuxt-app
-[nuxt中文官网](https://zh.nuxtjs.org/guide/installation)，跟着官网一步一步来。
+安装 node 环境
+
+## 1. 安装 create-nuxt-app
+
+[nuxt 中文官网](https://zh.nuxtjs.org/guide/installation)，跟着官网一步一步来。
+
 ```
 // yarn create nuxt-app <项目名>
 $ yarn create nuxt-app nuxt-cli
 $ cd nuxt-cli
 $ yarn run dev
 ```
+
 然后浏览器输入[localhost:3000](localhost:3000)，就会看到初始化页面，此时我们项目脚手架完成。
+
 ## 2. 直接部署
+
 ```
 $ yarn build
 $ yarn start
 ```
-## 3. 使用pm2进程管理部署
-[pm2中文官网](https://pm2.io/doc/zh/runtime/quick-start/)
+
+## 3. 使用 pm2 进程管理部署
+
+[pm2 中文官网](https://pm2.io/doc/zh/runtime/quick-start/)
 
 ```
 // 安装pm2
@@ -25,7 +33,8 @@ $ yarn global add pm2
 $ pm2 init
 ```
 
-然后会生成ecosystem.config.js文件，[ecosystem文件](https://pm2.io/doc/zh/runtime/reference/ecosystem-file/)参考。
+然后会生成 ecosystem.config.js 文件，[ecosystem 文件](https://pm2.io/doc/zh/runtime/reference/ecosystem-file/)参考。
+
 ```
 module.exports = {
   apps : [{
@@ -53,20 +62,25 @@ module.exports = {
   }],
 };
 ```
-启动test1（你会发现8080端口无效，看第4步）
+
+启动 test1（你会发现 8080 端口无效，看第 4 步）
+
 ```
 $ yarn build
-// 
+//
 $ pm2 startOrRestart ecosystem.config.js --env test1
 ```
-使用Makefile文件，一键部署,执行 make test1
+
+使用 Makefile 文件，一键部署,执行 make test1
+
 ```
 test1:
   yarn build
   pm2 startOrRestart ecosystem.config.js --env test1
 ```
 
-## 4. 更改server/index.js
+## 4. 更改 server/index.js
+
 ```
   // const {
   //   host = process.env.HOST || '127.0.0.1',
@@ -78,7 +92,8 @@ test1:
   const port = process.env.PORT || 4000
 ```
 
-## 5. 动静分离更改nuxt.config.js
+## 5. 动静分离更改 nuxt.config.js
+
 ```
   /*
   ** Build configuration
@@ -99,10 +114,13 @@ test1:
   }
 ```
 
-## 6. 添加axios Module, 集成代理
-> 以modules的形式引入，服务端和客户端都可以使用，自动挂在到客户端vue原型上，服务端context上。
-[https://axios.nuxtjs.org/extend](https://axios.nuxtjs.org/extend)
-1. 集成module
+## 6. 添加 axios Module, 集成代理
+
+> 以 modules 的形式引入，服务端和客户端都可以使用，自动挂在到客户端 vue 原型上，服务端 context 上。
+> [https://axios.nuxtjs.org/extend](https://axios.nuxtjs.org/extend)
+
+1. 集成 module
+
 ```
 $ yarn add @nuxtjs/axios
 
@@ -116,7 +134,9 @@ module.exports = {
   }
 }
 ```
-2. 添加请求响应拦截、baseURL(server side)、browserBaseURL(client side)，代理（axios自带）
+
+2. 添加请求响应拦截、baseURL(server side)、browserBaseURL(client side)，代理（axios 自带）
+
 ```
 {
   modules: [
@@ -142,7 +162,9 @@ module.exports = {
 ```
 
 ## 7. 添加组件缓存
-nuxt.config.js中添加modules
+
+nuxt.config.js 中添加 modules
+
 ```
   modules: [
     // 配置选项
@@ -152,18 +174,24 @@ nuxt.config.js中添加modules
     }],
   ],
 ```
+
 组件中使用：[https://ssr.vuejs.org/zh/guide/caching.html#%E7%BB%84%E4%BB%B6%E7%BA%A7%E5%88%AB%E7%BC%93%E5%AD%98-component-level-caching](https://ssr.vuejs.org/zh/guide/caching.html#%E7%BB%84%E4%BB%B6%E7%BA%A7%E5%88%AB%E7%BC%93%E5%AD%98-component-level-caching)
+
 ```
   name: 'item', // 必填选项
   props: ['item'],
   serverCacheKey: props => props.item.id,
 ```
-## 8. 集成scss/less
+
+## 8. 集成 scss/less
+
 ```
 yarn add node-sass sass-loader -D
 yarn add less less-loader -D
 ```
-得益于 vue-loader, 直接使用scss/less：
+
+得益于 vue-loader, 直接使用 scss/less：
+
 ```
 <style scoped lang="scss">
 .red {
@@ -177,13 +205,19 @@ yarn add less less-loader -D
 }
 </style>
 ```
-## 9. 集成eslint、prettier and Pre-commit Hook 约束代码提交
+
+## 9. 集成 eslint、prettier and Pre-commit Hook 约束代码提交
+
 ```
-yarn add babel-eslint eslint eslint-config-standard eslint-plugin-html eslint-plugin-promise eslint-plugin-standard eslint-plugin-import eslint-plugin-node -D
-yarn add prettier -D --exact
-yarn add eslint-plugin-prettier eslint-config-prettier eslint-plugin-vue -D
+$ yarn add babel-eslint eslint eslint-config-standard eslint-plugin-html eslint-plugin-promise eslint-plugin-standard eslint-plugin-import eslint-plugin-node -D
+$ yarn add prettier -D --exact
+$ yarn add eslint-plugin-prettier eslint-config-prettier eslint-plugin-vue -D
+// lint-staged、 husky插件，这样再每次 commit 代码的时候都会格式化一下。
+$ yarn add lint-staged husky@next -D
 ```
-添加.eslintrc.js文件
+
+添加.eslintrc.js 文件
+
 ```
 module.exports = {
   parser: 'vue-eslint-parser',
@@ -201,7 +235,9 @@ module.exports = {
   },
 };
 ```
-添加.prettierrc文件
+
+添加.prettierrc 文件
+
 ```
 {
  "tabWidth": 2,
@@ -211,7 +247,9 @@ module.exports = {
  "singleQuote": true
 }
 ```
-pageage.json中添加
+
+pageage.json 中添加
+
 ```
 // script
 scprit: {
@@ -229,7 +267,9 @@ scprit: {
     "*.{js,json,css,md}": ["prettier --write", "git add"]
   }
 ```
+
 vscode 保存自动修复
+
 ```
 {
     "editor.snippetSuggestions": "top",
@@ -255,4 +295,3 @@ vscode 保存自动修复
     "commentTranslate.targetLanguage": "zh-CN"
 }
 ```
-
