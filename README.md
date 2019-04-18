@@ -210,6 +210,7 @@ yarn add less less-loader -D
 
 ```
 $ yarn add babel-eslint eslint eslint-config-standard eslint-plugin-html eslint-plugin-promise eslint-plugin-standard eslint-plugin-import eslint-plugin-node -D
+$ yarn add eslint-loader -D
 $ yarn add prettier -D --exact
 $ yarn add eslint-plugin-prettier eslint-config-prettier eslint-plugin-vue -D
 // lint-staged、 husky插件，这样再每次 commit 代码的时候都会格式化一下。
@@ -236,6 +237,25 @@ module.exports = {
 };
 ```
 
+在 nuxt.config.js 中添加
+
+```
+build: {
+  extend(config, ctx) {
+
+      // Run ESLint on save
+      if (ctx.isDev && ctx.isClient) {
+        config.module.rules.push({
+          enforce: 'pre',
+          test: /\.(js|vue)$/,
+          loader: 'eslint-loader',
+          exclude: /(node_modules)/,
+        });
+      }
+    },
+}
+```
+
 添加.prettierrc 文件
 
 ```
@@ -257,7 +277,7 @@ scprit: {
   "format": "prettier --write '{components,config,layouts,pages,plugins,store,utils}/**/*.{js,json,vue,less}'"
 }
 
-// commit 约束代码提交
+// pre-commit 约束代码提交
 "husky": {
     "hooks": {
       "pre-commit": "lint-staged"
@@ -268,7 +288,7 @@ scprit: {
   }
 ```
 
-vscode 保存自动修复
+vscode 保存自动修复, (前提 vscode 安装 eslint 插件)
 
 ```
 {
