@@ -34,7 +34,7 @@ export default {
     border-bottom: 1px solid #dddddd;
     &:hover {
       background-color: #efefef;
-      color: blue;
+      color: blue
     }
   }
 }
