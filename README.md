@@ -406,4 +406,24 @@ module.exports = {
 }
 ```
 
-最后，localhost:8000 访问。
+最后，要将 image 里的.nuxt/dist/client/放到 CDN。（这里放到了本地/Users/apple/Desktop/learning/nuxt-cli/.nuxt/dist/，通过 nginx 访问，模拟动静分离）
+
+```
+// docker cp $(shell docker ps -l -q):/app/.nuxt/dist/client /Users/apple/Desktop/learning/nuxt-cli/.nuxt/dist/
+$ docker cp 047083a2f756:/app/.nuxt/dist/client /Users/apple/Desktop/learning/nuxt-cli/.nuxt/dist/
+```
+
+附上 nginx 配置, 配置 hosts(127.0.0.1 lizhuang.static.com)
+
+```
+server {
+        listen       80;
+        server_name  lizhuang.static.com;
+
+
+        location /static {
+         alias /Users/apple/Desktop/learning/nuxt-cli/.nuxt/dist/client/;
+    }
+```
+
+localhost:8000 访问。

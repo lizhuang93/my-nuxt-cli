@@ -7,3 +7,4 @@ test1:
 product:
 	docker image build -t nuxt-cli:${tag} .
 	docker container run -d -p 8000:3000 -it nuxt-cli:${tag}
+	docker cp $(shell docker ps -l -q):/app/.nuxt/dist/client /Users/apple/Desktop/learning/nuxt-cli/.nuxt/dist/
