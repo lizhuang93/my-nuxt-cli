@@ -92,7 +92,7 @@ test1:
   const port = process.env.PORT || 4000
 ```
 
-## 5. 动静分离更改 nuxt.config.js
+## 5. 动静分离, 更改 nuxt.config.js
 
 ```
   /*
@@ -163,9 +163,12 @@ module.exports = {
 
 ## 7. 添加组件缓存
 
-nuxt.config.js 中添加 modules
+nuxt.config.js 中添加 modules, 调试效果请看 pages/componentCache.vue
 
 ```
+$ yarn add @nuxtjs/component-cache
+
+// nuxt.config.js
   modules: [
     // 配置选项
     ['@nuxtjs/component-cache', {
@@ -206,7 +209,9 @@ yarn add less less-loader -D
 </style>
 ```
 
-## 9. 集成 eslint、prettier and Pre-commit Hook 约束代码提交
+## 9. 集成 eslint、prettier、Pre-commit Hook 约束代码提交
+
+安装以下依赖：
 
 ```
 $ yarn add babel-eslint eslint eslint-config-standard eslint-plugin-html eslint-plugin-promise eslint-plugin-standard eslint-plugin-import eslint-plugin-node -D
@@ -237,7 +242,7 @@ module.exports = {
 };
 ```
 
-在 nuxt.config.js 中添加
+在 nuxt.config.js 中添加 eslint-loader
 
 ```
 build: {
@@ -284,11 +289,11 @@ scprit: {
     }
   },
 "lint-staged": {
-    "*.{js,json,css,md}": ["prettier --write", "git add"]
+    "*.{js,json,css,md,vue}": ["prettier --write", "git add"]
   }
 ```
 
-vscode 保存自动修复, (前提 vscode 安装 eslint 插件)
+**扩展**：vscode 保存自动修复, (前提 vscode 安装 eslint 插件)
 
 ```
 {
@@ -315,3 +320,90 @@ vscode 保存自动修复, (前提 vscode 安装 eslint 插件)
     "commentTranslate.targetLanguage": "zh-CN"
 }
 ```
+
+## 10 docker 部署生产环境
+
+安装 docker，注册账号，登录。[docker 教程-阮一峰](http://www.ruanyifeng.com/blog/2018/02/docker-tutorial.html)
+
+使用 Makefile 文件一键部署， make product 。
+
+```
+// 取git中最新的一个tag, eg: 0.0.1
+$ make product
+
+// Makefile
+tag := $(shell git describe --always --tags | grep -Eo "[0-9]+\.[0-9]+[\.[0-9]+]*")
+
+test1:
+	yarn build
+	pm2 startOrRestart ecosystem.config.js --env test1
+
+product:
+	docker image build -t nuxt-cli:${tag} .
+	docker container run -d -p 8000:3000 -it nuxt-cli:${tag}
+```
+
+第一步： docker image build 命令会自动找 Dockerfile 文件
+
+```
+# keymetrics/pm2是一个依赖image，docker容器可以理解为微型虚拟机，运行nuxt需要node环境，这里用pm2做进程控制。
+FROM keymetrics/pm2:latest-alpine
+COPY . /app
+WORKDIR /app
+RUN npm install --registry=https://registry.npm.taobao.org
+RUN npm run build
+EXPOSE 3000
+# 【区别】: 当执行 docker container run -p 8000:3000 -it koa-demo /bin/bash 启动了容易之后
+# 【ENTRYPOINT】: 始终执行
+# 【CMD】: 会被/bin/bash覆盖
+ENTRYPOINT [ "sh", "./entrypoint.sh" ]
+# CMD node demos/02.js
+```
+
+第二步：docker container run -d -p 8000:3000 -it nuxt-cli:\${tag}, 启动容器之后会自动运行 ./entrypoint.sh，使用 pm2 启动 nuxt。
+
+```
+#!/bin/sh
+#npm config set registry https://registry.npm.taobao.org
+node -v
+# pm2 startOrRestart ecosystem.product.config.js --env production
+pm2-runtime start ecosystem.product.config.js --env production
+```
+
+ecosystem.product.config.js
+
+```
+const { join } = require('path')
+
+module.exports = {
+  apps: [
+    {
+      name: 'NUXT-CLI',
+      script: './server/index.js',
+      instances: '4',
+      autorestart: true,
+      watch: false,
+      max_memory_restart: '1G',
+      exec_mode: 'cluster',
+      merge_logs: true,
+      log_type: 'raw',
+      cwd: './',
+      args: `-c ${join(__dirname, 'nuxt.config.js')}`,
+      // 输出到标准日志
+      output: '/dev/stdout',
+      error: '/dev/stderr',
+      env: {
+        NODE_ENV: 'development'
+      },
+      env_production: {
+        NODE_ENV: 'production',
+        HOST: '0.0.0.0',
+        PORT: '3000',
+        ENABLE_NODE_LOG: 'YES'
+      }
+    }
+  ]
+}
+```
+
+最后，localhost:8000 访问。
