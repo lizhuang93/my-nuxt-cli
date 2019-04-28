@@ -150,6 +150,8 @@ module.exports = {
   axios: {
     proxy: true,
     // See https://github.com/nuxt-community/axios-module#options
+    // **注意**，若直接import axios 使用，会报127.0.0.1:port 错误，
+    // "服务端"要 axios.defaults.baseURL = config.baseURL
     baseURL: config.baseURL,
     browserBaseURL: '/'
   },
@@ -335,12 +337,13 @@ $ make product
 tag := $(shell git describe --always --tags | grep -Eo "[0-9]+\.[0-9]+[\.[0-9]+]*")
 
 test1:
-	yarn build
-	pm2 startOrRestart ecosystem.config.js --env test1
+  yarn build
+  pm2 startOrRestart ecosystem.config.js --env test1
 
 product:
-	docker image build -t nuxt-cli:${tag} .
-	docker container run -d -p 8000:3000 -it nuxt-cli:${tag}
+  docker image build -t nuxt-cli:${tag} .
+  docker container run -d -p 8000:3000 -it nuxt-cli:${tag}
+  docker cp $(shell docker ps -l -q):/app/.nuxt/dist/client /Users/apple/Desktop/learning/nuxt-cli/.nuxt/dist/
 ```
 
 第一步： docker image build 命令会自动找 Dockerfile 文件
