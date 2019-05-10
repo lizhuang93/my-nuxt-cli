@@ -48,6 +48,7 @@ module.exports = {
         maxAge: 1000 * 60 * 0.1, // 0.1分钟
       },
     ],
+    '@nuxtjs/sitemap',
   ],
   /*
    ** Axios module configuration
@@ -90,5 +91,11 @@ module.exports = {
         });
       }
     },
+  },
+
+  sitemap: {
+    hostname: 'https://www.bitdeer.com',
+    gzip: true,
+    exclude: [],
   },
 };

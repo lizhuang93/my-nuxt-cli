@@ -430,3 +430,19 @@ server {
 ```
 
 localhost:8000 访问。
+
+## 11. 生成 sitemap.xml 利于 SEO
+
+> 访问： [http://localhost:4000/sitemap.xml](http://localhost:4000/sitemap.xml)
+
+```
+modules: [
+    // 这里最好放在最后一个,(使用 nuxt-i18n 时，一定要放在nuxt-i18n 之后)
+    '@nuxtjs/sitemap',
+  ],
+sitemap: {
+    hostname: 'https://www.bitdeer.com',
+    gzip: true,
+    exclude: [],
+  },
+```
