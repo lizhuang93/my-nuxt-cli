@@ -135,12 +135,13 @@ module.exports = {
 }
 ```
 
-2. 添加请求响应拦截、baseURL(server side)、browserBaseURL(client side)，代理（axios 自带）
+2. 添加请求响应拦截、baseURL(server side)、browserBaseURL(client side)，代理（axios 自带[基于 nuxt-proxy]）
 
 ```
 {
   modules: [
     '@nuxtjs/axios',
+
   ],
 
   plugins: [
@@ -148,7 +149,7 @@ module.exports = {
     '~/plugins/axios'
   ],
   axios: {
-    proxy: true,
+    // proxy: true,
     // See https://github.com/nuxt-community/axios-module#options
     // **注意**，若直接import axios 使用，会报127.0.0.1:port 错误，
     // "服务端"要 axios.defaults.baseURL = config.baseURL
@@ -161,6 +162,17 @@ module.exports = {
     '/api2/': 'http://api.another-website.com'
   }
 }
+```
+
+3. 添加 node 层代理拦截, 使用服务端中间件。
+   // 解析浏览器 post 的 req.body
+   \$ yarn add body-parser
+
+```
+const bodyParser = require('body-parser')
+serverMiddleware: [
+  bodyParser.json(), //必须用此中间件，否则proxy拿不到body
+]
 ```
 
 ## 7. 添加组件缓存

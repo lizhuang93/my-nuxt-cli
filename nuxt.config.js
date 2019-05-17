@@ -1,6 +1,7 @@
 const pkg = require('./package');
 const env = process.env.NODE_ENV || 'production';
 let config = require(`./config/${env}.env`);
+const bodyParser = require('body-parser');
 
 module.exports = {
   mode: 'universal',
@@ -40,6 +41,27 @@ module.exports = {
    */
   modules: [
     '@nuxtjs/axios',
+    [
+      '@nuxtjs/proxy',
+      {
+        onProxyReq: (proxyReq, req, res) => {
+          // ClientRequest, IncomingMessage, ServerResponse
+          console.log('query---------->', req.query);
+          console.log('body----------->', req.body);
+        },
+        onProxyRes: (proxyReq, req = {}, res = {}) => {
+          let now = new Date();
+          console.log(
+            new Date().toString(),
+            '[proxy]',
+            `[${req.method}]`,
+            `URL: ${req.url}`,
+            `CODE: ${res.statusCode}`,
+            `TIME: ${now.getTime() - req.__startTime || 0}ms`
+          );
+        },
+      },
+    ],
     // 配置选项
     [
       '@nuxtjs/component-cache',
@@ -54,7 +76,6 @@ module.exports = {
    ** Axios module configuration
    */
   axios: {
-    proxy: true,
     // See https://github.com/nuxt-community/axios-module#options
     baseURL: config.baseURL,
     browserBaseURL: '/', // config.feServerBaseUrl
@@ -65,6 +86,9 @@ module.exports = {
     // 拼接/api
     '/api': config.baseURL,
   },
+  serverMiddleware: [
+    bodyParser.json(), //必须用此中间件，否则proxy拿不到body
+  ],
   /*
    ** Build configuration
    */
